@@ -32,6 +32,9 @@ public class Queues {
     @Value("${rabbitmq.bindingkey.asr}")
     public String bindingKey;
 
+    @Value("${rabbitmq.bindingkey.asr-en}")
+    public String bindingKeyEn;
+
     @Bean(name = "queue1")
     @Primary
     // @Qualifier("queue.cc1")
@@ -64,5 +67,14 @@ public class Queues {
     public Binding binging(@Qualifier("queue1") Queue queue, TopicExchange exchange){
         return BindingBuilder.bind(queue)
         .to(exchange).with(bindingKey);
+    }
+        /**
+     * 绑定路由键
+     * @return
+     */
+    @Bean("asren")
+    public Binding bingingEn(@Qualifier("queue2") Queue queue, TopicExchange exchange){
+        return BindingBuilder.bind(queue)
+        .to(exchange).with(bindingKeyEn);
     }
 }

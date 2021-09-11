@@ -71,7 +71,26 @@ public class AlgoService {
         // amqpTemplate.sendAndReceive(message);
         Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc", message);
         AsrVO asrVO = objectMapper.readValue(receiveMessage.getBody(), AsrVO.class);
-        System.out.println("return : "+ asrVO);
+        log.info("return : "+ asrVO.toString());
+        // System.out.println("receive "+receiveMessage.getMessageProperties());
+        return new AsyncResult<AsrVO>(asrVO);
+    }
+    @Async(value = "algo")
+    public Future<AsrVO> getAsrEn(MultipartFile audio, String format) throws InterruptedException, IOException {
+        AsrMQReq asrMQReq = new AsrMQReq(audio.getBytes(), format);
+        byte[] bytes = objectMapper.writeValueAsBytes(asrMQReq);
+        MessageProperties messageproperties = new MessageProperties();
+        String uuid = UUID.randomUUID().toString();
+        // 测试混乱id
+        // Shuffle.setId("2", uuid);
+        messageproperties.setCorrelationId(uuid);
+        // messageproperties.setReplyTo("amq.rabbitmq.reply-to.cc");
+        // messageproperties.setCorrelationId(uuid);
+        Message message = new Message(bytes, messageproperties);
+        // amqpTemplate.sendAndReceive(message);
+        Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc-en", message);
+        AsrVO asrVO = objectMapper.readValue(receiveMessage.getBody(), AsrVO.class);
+        log.info("return : "+ asrVO.toString());
         // System.out.println("receive "+receiveMessage.getMessageProperties());
         return new AsyncResult<AsrVO>(asrVO);
     }

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -21,6 +23,7 @@ import com.chenc.amqptest.pojo.AsrVO;
 import com.chenc.amqptest.pojo.Test;
 
 
+@Slf4j
 @RequestMapping("/")
 @RestController
 public class TestController {
@@ -45,8 +48,12 @@ public class TestController {
     @PostMapping("/asr")
     public AsrVO asr(@RequestParam("audio") MultipartFile audio,@RequestParam("format") String format) throws AmqpException, InterruptedException, IOException, ExecutionException{
         // amqpTemplate.setReplyTimeout(18000);
+        log.info("收到请求");
         Future<AsrVO> result = algoService.getAsr(audio, format);
+        Future<AsrVO> resultEn = algoService.getAsrEn(audio, format);
         AsrVO test = result.get();
+        AsrVO testEn = resultEn.get();
+        log.info(testEn.toString());
         return test;
     }
 
