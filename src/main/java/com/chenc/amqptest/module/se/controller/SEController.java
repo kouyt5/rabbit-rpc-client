@@ -40,7 +40,7 @@ public class SEController {
 
         Future<SEMQResp> fseMQResp = seService.getSE(audio.getBytes(), format);
         SEMQResp seMQResp = fseMQResp.get();
-        SEVo seVo = new SEVo(seMQResp.getDuration(), "", seMQResp.getEnhance());
+        SEVo seVo = new SEVo("", seMQResp.getDuration(), seMQResp.getEnhance());
         
         // 保存音频到仓库中 service.saveFile(byte[]);
         LocalDateTime localDateTime = LocalDateTime.now();
