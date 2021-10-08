@@ -1,4 +1,4 @@
-package com.chenc.amqptest.pojo;
+package com.chenc.amqptest.module.asr.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class AsrVO {
     private String sentence;
-    private String other;
+    private int other;
 }

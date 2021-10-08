@@ -1,18 +1,16 @@
-package com.chenc.amqptest.poolreq;
+package com.chenc.amqptest.module.asr.service;
 
 
-import com.chenc.amqptest.config.Shuffle;
-import com.chenc.amqptest.pojo.AsrMQReq;
-import com.chenc.amqptest.pojo.AsrVO;
+import com.chenc.amqptest.module.asr.pojo.AsrMQReq;
+import com.chenc.amqptest.module.asr.pojo.AsrVO;
 import com.chenc.amqptest.pojo.Test;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.Time;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
@@ -28,11 +26,11 @@ import java.util.concurrent.Future;
 @Component
 public class AlgoService {
 
-    private final AmqpTemplate amqpTemplate;
+    private final RabbitTemplate amqpTemplate;
     private ObjectMapper objectMapper;
 
     @Autowired
-    public AlgoService(AmqpTemplate amqpTemplate, @Qualifier("msgpackObjectMapper") ObjectMapper objectMapper){
+    public AlgoService(RabbitTemplate amqpTemplate, @Qualifier("msgpackObjectMapper") ObjectMapper objectMapper){
         this.amqpTemplate = amqpTemplate;
         this.objectMapper = objectMapper;
     }
@@ -43,21 +41,19 @@ public class AlgoService {
         byte[] bytes = objectMapper.writeValueAsBytes(test);
         MessageProperties messageproperties = new MessageProperties();
         String uuid = UUID.randomUUID().toString();
-        // 测试混乱id
-        Shuffle.setId("2", uuid);
         messageproperties.setCorrelationId(uuid);
         // messageproperties.setReplyTo("amq.rabbitmq.reply-to.cc");
         // messageproperties.setCorrelationId(uuid);
         Message message = new Message(bytes, messageproperties);
         // amqpTemplate.sendAndReceive(message);
-        Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc", message);
+        Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc", message, new CorrelationData(uuid));
         System.out.println("return2 : "+ objectMapper.readValue(receiveMessage.getBody(), Test.class));
         System.out.println("receive "+receiveMessage.getMessageProperties());
         return new AsyncResult<Test>(test);
     }
 
     @Async(value = "algo")
-    public Future<AsrVO> getAsr(MultipartFile audio, String format) throws InterruptedException, IOException {
+    public Future<AsrVO> getAsrCn(MultipartFile audio, String format) throws InterruptedException, IOException {
         AsrMQReq asrMQReq = new AsrMQReq(audio.getBytes(), format);
         byte[] bytes = objectMapper.writeValueAsBytes(asrMQReq);
         MessageProperties messageproperties = new MessageProperties();
@@ -69,7 +65,8 @@ public class AlgoService {
         // messageproperties.setCorrelationId(uuid);
         Message message = new Message(bytes, messageproperties);
         // amqpTemplate.sendAndReceive(message);
-        Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc", message);
+        log.info("ready to send to rabbitmq cn");
+        Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc", message, new CorrelationData(uuid));
         AsrVO asrVO = objectMapper.readValue(receiveMessage.getBody(), AsrVO.class);
         log.info("return : "+ asrVO.toString());
         // System.out.println("receive "+receiveMessage.getMessageProperties());
@@ -88,6 +85,7 @@ public class AlgoService {
         // messageproperties.setCorrelationId(uuid);
         Message message = new Message(bytes, messageproperties);
         // amqpTemplate.sendAndReceive(message);
+        log.info("ready to send to rabbitmq en");
         Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc-en", message);
         AsrVO asrVO = objectMapper.readValue(receiveMessage.getBody(), AsrVO.class);
         log.info("return : "+ asrVO.toString());

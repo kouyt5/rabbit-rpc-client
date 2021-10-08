@@ -1,34 +1,29 @@
 package com.chenc.amqptest.config;
 
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate.ConfirmCallback;
-import org.springframework.amqp.rabbit.core.RabbitTemplate.ReturnCallback;
-import org.springframework.amqp.rabbit.core.RabbitTemplate.ReturnsCallback;
-
-import com.chenc.amqptest.receiver.TestReceiver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.ReturnedMessage;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory.ConfirmType;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate.ConfirmCallback;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
+@Slf4j
 @Configuration
 @EnableRabbit
 public class RabbitMQConfig {
@@ -60,7 +55,7 @@ public class RabbitMQConfig {
         cachingConnectionFactory.setChannelCacheSize(50);
         
         // 消息到broke确认回调
-        cachingConnectionFactory.setPublisherConfirmType(ConfirmType.CORRELATED);
+        // cachingConnectionFactory.setPublisherConfirmType(ConfirmType.CORRELATED);
         
         return cachingConnectionFactory;
     }
@@ -78,6 +73,14 @@ public class RabbitMQConfig {
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
         rabbitTemplate.setReceiveTimeout(receiveTimeout);
         rabbitTemplate.setReplyTimeout(replyTimeout);
+        rabbitTemplate.setConfirmCallback(new ConfirmCallback(){
+
+            @Override
+            public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+                log.info("broke 收到消息: "+ ack);
+            }
+            
+        });
         return rabbitTemplate;
     }
 

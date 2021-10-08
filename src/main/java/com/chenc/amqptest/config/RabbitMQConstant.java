@@ -17,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @Configuration
 @PropertySource("classpath:queues.properties")
-public class Queues {
+public class RabbitMQConstant {
     @Value("${rabbitmq.queue.cc1}")
     public String queue1;
 
@@ -34,6 +34,15 @@ public class Queues {
 
     @Value("${rabbitmq.bindingkey.asr-en}")
     public String bindingKeyEn;
+
+    @Value("${rabbitmq.bindingkey.se}")
+    public String bindingKeySe;
+
+    @Value("${rabbitmq.exchange.se}")
+    public String seExchange;
+
+    @Value("${rabbitmq.queue.seBase}")
+    public String se;
 
     @Bean(name = "queue1")
     @Primary

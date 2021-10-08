@@ -20,9 +20,9 @@ public class TaskExecutorConfiguration {
     @Bean(name = "algo")
     public TaskExecutor algoExecutor() {
         ThreadPoolTaskExecutor executor = new LoggerThreadPoolTaskExecutor();
-        executor.setCorePoolSize(20);
-        executor.setMaxPoolSize(50);
-        executor.setQueueCapacity(100);
+        executor.setCorePoolSize(50);
+        executor.setMaxPoolSize(100);
+        // executor.setQueueCapacity(100);
         executor.setKeepAliveSeconds(20);
         executor.setThreadNamePrefix("ccAsync-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());

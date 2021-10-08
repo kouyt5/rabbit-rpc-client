@@ -1,31 +1,25 @@
-package com.chenc.amqptest.sender;
+package com.chenc.amqptest.mqautocheck.sender;
 
 
-import com.chenc.amqptest.poolreq.AlgoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.chenc.amqptest.config.Queues;
-import com.chenc.amqptest.config.Shuffle;
+import com.chenc.amqptest.module.asr.service.AlgoService;
 import com.chenc.amqptest.pojo.Test;
 
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 
 @Slf4j
@@ -56,13 +50,19 @@ public class TestSender {
 
 
     // @Scheduled(fixedDelay = 10000, initialDelay = 1000)
-    public void sendTimeOut(){
+    public void sendTimeOut() throws JsonProcessingException{
         System.out.println("send a message");
         // Test test = new Test("1", "2");
+        MessageProperties messageproperties = new MessageProperties();
+        String uuid = UUID.randomUUID().toString();
+        // messageproperties.setReplyTo("amq.rabbitmq.reply-to.cc");
+        // messageproperties.setCorrelationId(uuid);
         Test test = new Test("a", "b");
-        String message = (String) amqpTemplate.convertSendAndReceive(timeoutQuene.getName(), test);
-        if (message != null){
-            System.out.println(message);
+        byte[] bytes = objectMapper.writeValueAsBytes(test);
+        Message message = new Message(bytes, messageproperties);
+        Message messages = amqpTemplate.sendAndReceive(timeoutQuene.getName(), message, new CorrelationData(uuid));
+        if (messages != null){
+            System.out.println(messages);
         }else {
             System.out.println("wait timeout ...");
         }
@@ -88,28 +88,29 @@ public class TestSender {
         // messageproperties.setReplyTo("amq.rabbitmq.reply-to.cc");
         messageproperties.setCorrelationId(uuid);
 
-        // 测试混乱id
-        Shuffle.setId("1", uuid);
         Message message = new Message(bytes, messageproperties);
         // amqpTemplate.sendAndReceive(message);
         Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc", message);
         System.out.println("return1 : "+ objectMapper.readValue(receiveMessage.getBody(), Test.class));
         System.out.println("receive "+receiveMessage.getMessageProperties());
     }
-    // @Scheduled(fixedDelay = 500, initialDelay = 1000)
+
+    /**
+     * 返回相同的消息
+     * @throws IOException
+     */
+    // @Scheduled(fixedDelay = 5000, initialDelay = 1000)
     public void testRpc2() throws IOException{
         Test test = new Test("2", "2");
         byte[] bytes = objectMapper.writeValueAsBytes(test);
         MessageProperties messageproperties = new MessageProperties();
         String uuid = UUID.randomUUID().toString();
-        // 测试混乱id
-        Shuffle.setId("2", uuid);
         messageproperties.setCorrelationId(uuid);
         // messageproperties.setReplyTo("amq.rabbitmq.reply-to.cc");
         // messageproperties.setCorrelationId(uuid);
         Message message = new Message(bytes, messageproperties);
         // amqpTemplate.sendAndReceive(message);
-        Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc", message);
+        Message receiveMessage = amqpTemplate.sendAndReceive("test", "test", message);
         System.out.println("return2 : "+ objectMapper.readValue(receiveMessage.getBody(), Test.class));
         System.out.println("receive "+receiveMessage.getMessageProperties());
     }

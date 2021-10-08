@@ -1,4 +1,4 @@
-package com.chenc.amqptest.pojo;
+package com.chenc.amqptest.module.asr.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
