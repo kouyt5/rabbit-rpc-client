@@ -1,7 +1,5 @@
 package com.chenc.amqptest.componet;
 
-import java.util.concurrent.ExecutionException;
-
 import com.chenc.amqptest.base.BaseResponse;
 import com.chenc.amqptest.base.exception.BaseException;
 
