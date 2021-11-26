@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.springframework.amqp.core.Message;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.chenc.amqptest.base.exception.TimeoutException;
 import com.chenc.amqptest.module.asr.pojo.AsrVO;
@@ -11,8 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -21,13 +20,16 @@ import lombok.extern.slf4j.Slf4j;
  * @author cc
  * @since 21.11.26
  */
-@AllArgsConstructor
 @Service
 @Slf4j
 public class AsrService {
     private final AlgoService algoService;
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     
+    public AsrService(AlgoService algoService, @Qualifier("msgpackObjectMapper") ObjectMapper objectMapper){
+        this.algoService = algoService;
+        this.objectMapper = objectMapper;
+    }
     /**
      * 获取算法结果
      * @param audio 音频
