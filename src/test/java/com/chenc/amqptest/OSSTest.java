@@ -49,7 +49,7 @@ public class OSSTest {
                                     ossConfig.accessKeyId, 
                                     ossConfig.accessKeySecret, 
                                     ossConfig.roleArn, 
-                                    "cn-qingdao","roleSessionName",  "productName", 12*3600L);
+                                    "cn-qingdao","roleSessionName",  "productName", 60*15L);
         OSS ossClient2 = new OSSClientBuilder().build(ossConfig.endpoint, credential.getAccessKeyId(), 
                             credential.getAccessKeySecret(), credential.getSecurityToken());
         // List<Bucket> buckets = ossClient2.listBuckets();
