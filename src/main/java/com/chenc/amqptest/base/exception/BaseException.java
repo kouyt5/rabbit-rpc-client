@@ -1,10 +1,5 @@
 package com.chenc.amqptest.base.exception;
 
-import com.chenc.amqptest.base.status.BaseStatus;
-import com.rabbitmq.client.AMQP.Confirm.Select;
-
-import lombok.val;
-
 /**
  * Base异常，程序可控异常应该继承此类型
  * @author kouyt5

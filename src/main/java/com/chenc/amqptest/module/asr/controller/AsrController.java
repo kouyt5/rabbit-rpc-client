@@ -1,7 +1,6 @@
 package com.chenc.amqptest.module.asr.controller;
 
 import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
