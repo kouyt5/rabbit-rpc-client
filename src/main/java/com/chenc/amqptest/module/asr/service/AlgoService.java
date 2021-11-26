@@ -1,8 +1,8 @@
 package com.chenc.amqptest.module.asr.service;
 
 
+import com.chenc.amqptest.base.exception.TimeoutException;
 import com.chenc.amqptest.module.asr.pojo.AsrMQReq;
-import com.chenc.amqptest.module.asr.pojo.AsrVO;
 import com.chenc.amqptest.pojo.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,8 +42,6 @@ public class AlgoService {
         MessageProperties messageproperties = new MessageProperties();
         String uuid = UUID.randomUUID().toString();
         messageproperties.setCorrelationId(uuid);
-        // messageproperties.setReplyTo("amq.rabbitmq.reply-to.cc");
-        // messageproperties.setCorrelationId(uuid);
         Message message = new Message(bytes, messageproperties);
         // amqpTemplate.sendAndReceive(message);
         Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc", message, new CorrelationData(uuid));
@@ -53,43 +51,27 @@ public class AlgoService {
     }
 
     @Async(value = "algo")
-    public Future<AsrVO> getAsrCn(MultipartFile audio, String format) throws InterruptedException, IOException {
+    public Future<Message> getAsrCnMQ(MultipartFile audio, String format) throws InterruptedException, IOException, TimeoutException {
         AsrMQReq asrMQReq = new AsrMQReq(audio.getBytes(), format);
         byte[] bytes = objectMapper.writeValueAsBytes(asrMQReq);
         MessageProperties messageproperties = new MessageProperties();
         String uuid = UUID.randomUUID().toString();
-        // 测试混乱id
-        // Shuffle.setId("2", uuid);
         messageproperties.setCorrelationId(uuid);
-        // messageproperties.setReplyTo("amq.rabbitmq.reply-to.cc");
-        // messageproperties.setCorrelationId(uuid);
         Message message = new Message(bytes, messageproperties);
-        // amqpTemplate.sendAndReceive(message);
         log.info("ready to send to rabbitmq cn");
         Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc", message, new CorrelationData(uuid));
-        AsrVO asrVO = objectMapper.readValue(receiveMessage.getBody(), AsrVO.class);
-        log.info("return : "+ asrVO.toString());
-        // System.out.println("receive "+receiveMessage.getMessageProperties());
-        return new AsyncResult<AsrVO>(asrVO);
+        return new AsyncResult<Message>(receiveMessage);
     }
     @Async(value = "algo")
-    public Future<AsrVO> getAsrEn(MultipartFile audio, String format) throws InterruptedException, IOException {
+    public Future<Message> getAsrEnMQ(MultipartFile audio, String format) throws InterruptedException, IOException, TimeoutException {
         AsrMQReq asrMQReq = new AsrMQReq(audio.getBytes(), format);
         byte[] bytes = objectMapper.writeValueAsBytes(asrMQReq);
         MessageProperties messageproperties = new MessageProperties();
         String uuid = UUID.randomUUID().toString();
-        // 测试混乱id
-        // Shuffle.setId("2", uuid);
         messageproperties.setCorrelationId(uuid);
-        // messageproperties.setReplyTo("amq.rabbitmq.reply-to.cc");
-        // messageproperties.setCorrelationId(uuid);
         Message message = new Message(bytes, messageproperties);
-        // amqpTemplate.sendAndReceive(message);
         log.info("ready to send to rabbitmq en");
         Message receiveMessage = amqpTemplate.sendAndReceive("asrExchange", "rpc-en", message);
-        AsrVO asrVO = objectMapper.readValue(receiveMessage.getBody(), AsrVO.class);
-        log.info("return : "+ asrVO.toString());
-        // System.out.println("receive "+receiveMessage.getMessageProperties());
-        return new AsyncResult<AsrVO>(asrVO);
+        return new AsyncResult<Message>(receiveMessage);
     }
 }

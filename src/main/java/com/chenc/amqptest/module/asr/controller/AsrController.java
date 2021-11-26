@@ -13,11 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
 import com.chenc.amqptest.base.BaseResponse;
+import com.chenc.amqptest.base.exception.TimeoutException;
 import com.chenc.amqptest.module.asr.pojo.AsrVO;
-import com.chenc.amqptest.module.asr.service.AlgoService;
+import com.chenc.amqptest.module.asr.service.AsrService;
 
 
 @Slf4j
@@ -25,23 +24,19 @@ import com.chenc.amqptest.module.asr.service.AlgoService;
 @RestController
 public class AsrController {
 
-    private final AmqpTemplate amqpTemplate;
-    private final AlgoService algoService;
+    private final AsrService asrService;
     
-
     @Autowired
-    public AsrController(AmqpTemplate amqpTemplate, AlgoService algoService){
-        this.algoService = algoService;
-        this.amqpTemplate = amqpTemplate;
+    public AsrController(AsrService asrService){
+        this.asrService = asrService;
     }
 
     @PostMapping("/asr")
-    public BaseResponse<AsrVO> asr(@RequestParam("audio") MultipartFile audio,@RequestParam("format") String format) throws AmqpException, InterruptedException, IOException, ExecutionException{
+    public BaseResponse<AsrVO> asr(@RequestParam("audio") MultipartFile audio,@RequestParam("format") String format) throws AmqpException, InterruptedException, IOException, ExecutionException, TimeoutException{
         // amqpTemplate.setReplyTimeout(18000);
         log.info("收到请求");
-        Future<AsrVO> result = algoService.getAsrCn(audio, format);
+        AsrVO asrVO = asrService.getCnResult(audio, format);
         // Future<AsrVO> resultEn = algoService.getAsrEn(audio, format);
-        AsrVO asrVO = result.get();
         // AsrVO testEn = resultEn.get();
         return new BaseResponse.Builder<AsrVO>()
                     .setData(asrVO)
