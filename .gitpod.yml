@@ -1,0 +1,14 @@
+
+# tasks:
+#   - init: echo 'init script' # runs during prebuild
+#     command: echo 'start script'
+ports:
+  - port: 8083
+    onOpen: open-preview
+
+vscode:
+  extensions:
+    - vscjava.vscode-java-pack
+    - gabrielbb.vscode-lombok
+    - vscjava.vscode-java-test
+    - redhat.java
