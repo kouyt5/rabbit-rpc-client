@@ -1,0 +1,9 @@
+extraction:
+  java:
+    before_index:
+      export BUILD_MODE=release
+    index:
+      step:
+        java_version: 11
+      maven:
+        version: 3.5.2
