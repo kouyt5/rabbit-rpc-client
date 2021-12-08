@@ -1,4 +1,5 @@
 # rabbit rpc batch SpringBoot实现
+<a href="./LICENSE.txt"><img alt="GitHub" src="https://img.shields.io/github/license/kouyt5/rabbit-rpc-client"></a>
 <a href="https://lgtm.com/projects/g/kouyt5/rabbit-rpc-client/alerts/"><img alt="Total alerts" src="https://img.shields.io/lgtm/alerts/g/kouyt5/rabbit-rpc-client.svg?logo=lgtm&logoWidth=18"/></a>
 <a href="https://lgtm.com/projects/g/kouyt5/rabbit-rpc-client/context:java"><img alt="Language grade: Java" src="https://img.shields.io/lgtm/grade/java/g/kouyt5/rabbit-rpc-client.svg?logo=lgtm&logoWidth=18"/></a>
 
