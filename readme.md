@@ -1,4 +1,6 @@
 # rabbit rpc batch SpringBoot实现
+<a href="https://lgtm.com/projects/g/kouyt5/rabbit-rpc-client/alerts/"><img alt="Total alerts" src="https://img.shields.io/lgtm/alerts/g/kouyt5/rabbit-rpc-client.svg?logo=lgtm&logoWidth=18"/></a>
+<a href="https://lgtm.com/projects/g/kouyt5/rabbit-rpc-client/context:java"><img alt="Language grade: Java" src="https://img.shields.io/lgtm/grade/java/g/kouyt5/rabbit-rpc-client.svg?logo=lgtm&logoWidth=18"/></a>
 
 用于消息队列批处理框架的客户端接口实现。
 
