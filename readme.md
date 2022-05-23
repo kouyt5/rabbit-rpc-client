@@ -6,16 +6,47 @@
 用于消息队列批处理框架的客户端接口实现。
 
 ## 环境
-+ rabbitmq安装
-+ java8
++ rabbitmq
++ java11
++ maven
 
-## 配置信息
-+ rabbitmq配置(src/main/resources/application.properties)
-+ 阿里云OSS权限信息（src/main/resources/oss.properties 可选，不配置也能调用）
+## 如何运行
+
+```bash
+mvn package
+java -jar target/rabbit-prc-client-1.0.0.jar
+```
+
+docker支持
+```
+docker build -f docker/Dockerfile . -t 511023/rabbit-rpc-client
+docker run -it --rm --network host 511023/rabbit-rpc-client
+```
 
 ## 接口信息
 
-请查看类 `src/main/java/com/chenc/amqptest/module/se/controller/SEController.java`,接口相关模块例如SE、ASR都在module文件夹下。
+接口相关模块例如SE、ASR都在module文件夹下。
+### 语音识别
++ 请求方法 `POST`
++ 接口地址: localhost:8083/asr
++ 接口参数:
+
+|参数名|类型|示例|说明|
+|---|---|---|---|
+|audio|file|@/path/to/wav.wav|文件|
+|audio|string|"wav"|音频格式, mp3等|
+
++ 输出:
+```json
+{
+    "status": 200,
+    "message": "success",
+    "data": {
+        "sentence": "xxxxx",
+        "other": 200
+    }
+}
+```
 
 ## OTHER
 
